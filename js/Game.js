@@ -1,50 +1,86 @@
 
+import Block from "./Block.js";
+import Shape from "./Shape.js";
+
 class Game {
-  constructor(){
-    //cols and rows
+  constructor(canvas){
+    this.canvas = canvas;
     this.cols = 12;
     this.rows = 21;
-    this.colsBoard = 12;
-    this.colsPanel = 6;
-    this.rowsPanel = 6;
-    this.ts = 20;
-    this.game = document.querySelector("#game");
-    this.width;
-    this.height;
+    this.ts = 20; //tile size
+    this.gs = 2; //gap size
+    this.width = this.height = 0;
     this.ctx;
-    //gameloop
-    this.gameloop;
+    this.loop;
+    
+    //color blocks
+    this.colorBlock = {
+      wall: "#777",
+      iShape: "#f00",
+      lShape: "#0f0",
+      oShape: "#0ff",
+      tShape: "#ff0",
+      zShape: "#f0f",
+      complete: "#eee"
+    }
+    
+    //shapes
+    this.shapeTypes = [
+      {name: "iShape", c: this.colorBlock.iShape},
+      {name: "lShape", c: this.colorBlock.lShape},
+      {name: "oShape", c: this.colorBlock.oShape},
+      {name: "tShape", c: this.colorBlock.tShape},
+      {name: "zShape", c: this.colorBlock.zShape}
+    ];
+    
+    this.randomShapeType;
+    this.shape;
   }
   
-  start(){
-    this.game.width = (this.cols * this.ts);
-    this.game.height = (this.rows * this.ts);
-    this.ctx = this.game.getContext("2d");
-    //width and height
-    this.width = this.game.width;
-    this.height = this.game.height;
-    
-    //gameloop
-    this.render();
-    this.gameloop = setInterval(this.update.bind(this), 1000);
+  renderWalls(){
+    for (let c = 0; c < this.cols; c++){
+      for (let r = 0; r < this.rows; r++){
+        if (c === 0 || c === this.cols-1 || r === this.rows-1){
+          const {ts, gs, colorBlock} = this;
+          const block = new Block(c, r, ts, ts, colorBlock.wall, gs);
+          block.render(this.ctx);
+        }
+      }
+    }
   }
   
   render(){
-    //paint the screen of the game
-    this.ctx.fillStyle = "#000";
+    //draw screen
+    this.ctx.fillStyle = "#0000";
     this.ctx.fillRect(0, 0, this.width, this.height);
-    
-    //draw-grids
+    //board
+    this.renderWalls();
+    //shape
+    this.shape.render(this.ctx);
   }
   
   update(){
-    //render game
     this.render();
-    //console.log("updating...");
   }
   
-  control(cmd){
-    console.log("commands");
+  start(){
+    this.width = (this.cols * this.ts);
+    this.height = (this.rows * this.ts);
+    //config canvas
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.ctx = this.canvas.getContext("2d");
+    
+    //define first shape
+    this.randomShapeType = this.shapeTypes[Math.floor(Math.random() * this.shapeTypes.length)];
+    this.shape = new Shape(this.cols/2-2, 0, this.ts, this.gs, this.randomShapeType);
+  
+    //game loop
+    this.loop = setInterval(this.update.bind(this), 150);
+  }
+  
+  control(key){
+    console.log(key);
   }
 }
 
