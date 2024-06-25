@@ -1,5 +1,5 @@
 
-import Game from "./game.js";
+import Game from "./GameBoard.js";
 
 //create game Object
 const game = new Game(document.querySelector("#game"));
