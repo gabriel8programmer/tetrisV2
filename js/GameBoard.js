@@ -160,7 +160,7 @@ class Game {
       this.shape.moveLeft();
     } else if (key === "ArrowDown" && this.down){
       this.shape.moveDown();
-    } else if (key === "rotate" && this.rotate){
+    } else if (key === "rotate" || key === "ArrowUp" || key === " " && this.rotate){
       this.shape.rotate();
     }
     //render game again
