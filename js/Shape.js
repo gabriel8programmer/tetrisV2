@@ -161,10 +161,6 @@ class Shape {
     }
     this.shape = this.$shape();
   }
-  
-  update(){
-    
-  }
 }
 
 export default Shape;
