@@ -208,8 +208,8 @@ class Game {
       this.removeBlockRows();
       this.moveRestBlocksForDown();
       //update score and velocity
-      this.updateScore(100);
-      this.updateVelocity(10*(this.blocks.length/this.cols));
+      this.updateScore(100 * this.blocks.length/(this.cols-2));
+      this.updateVelocity(10);
     }
   }
   
