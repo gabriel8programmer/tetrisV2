@@ -1,6 +1,7 @@
 
 import Shape from "./Shape.js";
 import Block from "./Block.js";
+import Text from "./TextObj.js";
 
 class Game {
   constructor(game){
@@ -10,11 +11,17 @@ class Game {
     //game variables
     this.cols = 12;
     this.rows = 21;
+    this.panelCols = 8;
     this.bs = 20; //block size
-    this.width = this.cols * this.bs;
+    this.width = this.cols * this.bs + (this.panelCols * this.bs);
     this.height = this.rows * this.bs;
-    this.frames = 400;
+    this.initialFrame = 400;
+    this.frames = this.initialFrame;
+    this.frameLimit = 100;
+    this.loop;
+    this.started = false;
     this.gameover = false;
+    this.score = 0;
     //shape variables
     this.shapes=[];
     this.blocks=[];
@@ -30,12 +37,26 @@ class Game {
     this.shapeSortedIndex = 0;
     this.shapeTypeSorted;
     this.shape;
+    this.nextShape;
+    
+    //initialize canvas
+    this.game.width = this.width;
+    this.game.height = this.height;
   }
   
-  defineNewShape(){
+  defineRandomShapeType(){
     this.shapeSortedIndex = Math.floor(Math.random() * this.shapeTypes.length);
     this.shapeTypeSorted = this.shapeTypes[this.shapeSortedIndex];
-    this.shape = new Shape((this.cols-2)/2, 0, this.bs, this.bs, this.shapeTypeSorted);
+  }
+  
+  defineNextShape(){
+    //define new shape type and update next shape
+    this.defineRandomShapeType();
+    this.nextShape = new Shape(this.cols+(this.panelCols/2-1), this.rows/2-3, this.bs, this.bs, this.shapeTypeSorted);
+  }
+  
+  defineNewShape(type){
+    this.shape = new Shape(this.cols/2 -1, 0, this.bs, this.bs, type);
     //update shapes
     this.shapes.push(this.shape);
   }
@@ -67,10 +88,37 @@ class Game {
     });
   }
   
+  renderNextShape(){
+    this.nextShape.render(this.ctx);
+  }
+  
+  renderTexts(){
+    //render score text
+    let text = new Text(`${this.score}`, (this.cols+this.panelCols-1)*this.bs, 1 * this.bs, '20px Arial', 'yellow', 'right', 'top');
+    text.render(this.ctx);
+    //render next shape text
+    text = new Text("Next", (this.cols+(this.panelCols/2))*this.bs, (this.rows/2-4) * this.bs, '24px Arial', 'yellow', 'center', 'bottom');
+    text.render(this.ctx);
+    //render gameover text
+    if (!this.gameover) return;
+    text = new Text("Gameover", (this.cols+(this.panelCols/2))*this.bs, (this.rows-8) * this.bs, '28px Arial', 'red', 'center', 'top');
+    text.render(this.ctx);
+    //press any key text
+    if (!this.gameover) return;
+    text = new Text("Press any key to play again", (this.cols+(this.panelCols/2))*this.bs, (this.rows-6) * this.bs, '11px Arial', 'yellow', 'center', 'top');
+    text.render(this.ctx);
+  }
+  
+  renderPanel(){
+    this.renderNextShape();
+    this.renderTexts();
+  }
+  
   render(){
     this.renderScreen();
     this.renderBoard();
     this.renderShapes();
+    this.renderPanel();
   }
   
   checkCollide(callback){
@@ -118,7 +166,6 @@ class Game {
   moveRestBlocksForDown(){
     const minRow = Math.min(...this.blocks.map(({y}) => y));
     const maxRow = Math.max(...this.blocks.map(({y}) => y));
-    console.log(minRow, maxRow)
     this.shapes.forEach(({shape}) => {
       shape = shape.filter(block => block.y < minRow).map(block => {
         block.y += (maxRow+1-minRow);
@@ -160,21 +207,44 @@ class Game {
       //remove block rows combined and move rest blocks for down
       this.removeBlockRows();
       this.moveRestBlocksForDown();
+      //update score and velocity
+      this.updateScore(100);
+      this.updateVelocity(10*(this.blocks.length/this.cols));
     }
   }
   
   checkGameOver(){
-    /*const shapeInTop = this.shapes.some(shape => shape.position.y.min <= 1);
+    const shapeInTop = this.shapes.some(shape => shape.position.y.min <= 1 && shape.freezed);
     if (shapeInTop){
       this.gameover = true;
-    }*/
+      this.shape.freezed = true;
+    }
+  }
+  
+  updateScore(inc){
+    this.score += inc;
+  }
+  
+  updateVelocity(inc){
+    this.frames-=inc;
+    if (this.frames <= this.frameLimit) {
+      this.frames = this.frameLimit;
+    }
+    //update game loop
+    clearInterval(this.loop);
+    this.loop = setInterval(this.update.bind(this), this.frames);
   }
   
   freezeShape(){
     if (this.shape.freezed){
       this.checkThereWasCombination();
-      this.defineNewShape();
+      //new shape and next shape
+      this.defineNewShape(this.nextShape.type);
+      this.defineNextShape();
       this.checkGameOver();
+      //define score and frames
+      this.updateScore(10);
+      this.updateVelocity(1);
     }
   }
   
@@ -185,36 +255,50 @@ class Game {
   }
   
   update(){
-    if (this.gameover) return;
+    if (this.gameover || !this.started) return;
     //update
     this.updateShape();
-    setTimeout(this.update.bind(this), this.frames);
   }
   
   start(){
-    //init canvas
-    this.game.width = this.width;
-    this.game.height = this.height;
     //define first shape
-    this.defineNewShape();
+    this.defineRandomShapeType();
+    this.defineNewShape(this.shapeTypeSorted);
+    this.defineNextShape();
     //render and update game
-    setInterval(this.render.bind(this), 1);
-    this.update();
+    setInterval(this.render.bind(this), 1000/60);
+    this.loop = setInterval(this.update.bind(this), this.frames);
+  }
+  
+  reset(){
+    this.shapes = [];
+    this.shape = null;
+    this.nextShape = null;
+    this.started = false;
+    this.gameover = false;
+    this.score = 0;
+    this.frames = this.initialFrame;
+    //clear gameloop
+    clearInterval(this.loop);
+    //play again
+    this.start();
   }
   
   control(key){
     if (!key) return;
-    if (key === "ArrowRight" && this.right){
+    if (key === "ArrowRight" && this.right && this.started){
       this.shape.moveRight();
-    } else if (key === "ArrowLeft" && this.left){
+    } else if (key === "ArrowLeft" && this.left && this.started){
       this.shape.moveLeft();
-    } else if (key === "ArrowDown" && this.down){
+    } else if (key === "ArrowDown" && this.down && this.started){
       this.shape.moveDown();
-    } else if (key === "rotate" && this.rotate){
+    } else if ((key === "rotate" || key === "ArrowUp" || key === " ") && this.rotate && this.started){
       this.shape.rotate();
+    } else if (this.gameover){
+      this.reset();
+    } else {
+      this.started = true;
     }
-    //render game again
-    //this.render();
   }
 }
 
