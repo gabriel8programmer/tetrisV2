@@ -26,13 +26,13 @@ class Game {
     this.shapes=[];
     this.blocks=[];
     this.shapeTypes = [
-      {name: "i", src: "../img/block02.png"},
-      {name: "j", src: "../img/block03.png"},
-      {name: "l", src: "../img/block04.png"},
-      {name: "o", src: "../img/block05.png"},
-      {name: "s", src: "../img/block06.png"},
-      {name: "t", src: "../img/block07.png"},
-      {name: "z", src: "../img/block08.png"},
+      {name: "i", src: "./img/block02.png"},
+      {name: "j", src: "./img/block03.png"},
+      {name: "l", src: "./img/block04.png"},
+      {name: "o", src: "./img/block05.png"},
+      {name: "s", src: "./img/block06.png"},
+      {name: "t", src: "./img/block07.png"},
+      {name: "z", src: "./img/block08.png"},
     ];
     this.shapeSortedIndex = 0;
     this.shapeTypeSorted;
@@ -69,10 +69,10 @@ class Game {
   renderBoard(){
     for (let c = 0; c < this.cols; c++){
       for (let r = 0; r < this.rows; r++){
-        const block = new Block(c, r, this.bs, this.bs, "../img/block00.png");
+        const block = new Block(c, r, this.bs, this.bs, "./img/block00.png");
         if (c === 0 || c === this.cols-1 || r === this.rows-1){
           //render walls
-          block.src = "../img/block01.png";
+          block.src = "./img/block01.png";
           block.render(this.ctx);
         } else {
           //render background
