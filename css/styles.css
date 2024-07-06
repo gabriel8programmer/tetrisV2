@@ -60,13 +60,9 @@ h1 {
   grid-column: 2;
 }
 
-/*
-.gradient-text {
-  background: linear-gradient(45deg, #ff7300, #eaeaea);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+audio {
+  display: none;
 }
-*/
 
 /*responsivity*/
 @media (min-width: 1024px){

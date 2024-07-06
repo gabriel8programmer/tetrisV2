@@ -42,6 +42,15 @@ class Game {
     //initialize canvas
     this.game.width = this.width;
     this.game.height = this.height;
+    //get audios and config
+    this.$audioPoint = document.querySelector("#audio-point");
+    this.$audioPoint.volume = 0.5;
+    this.$soundtrack = document.querySelector("#audio-soundtrack");
+    this.$soundtrack.volume = 0.5;
+    //event the sound
+    this.$soundtrack.addEventListener("ended", ()=> {
+      this.$soundtrack.play();
+    });
   }
   
   defineRandomShapeType(){
@@ -207,9 +216,10 @@ class Game {
       //remove block rows combined and move rest blocks for down
       this.removeBlockRows();
       this.moveRestBlocksForDown();
-      //update score and velocity
+      //update score and velocity and play sound
       this.updateScore(100 * this.blocks.length/(this.cols-2));
       this.updateVelocity(10);
+      this.$audioPoint.play();
     }
   }
   
@@ -218,6 +228,9 @@ class Game {
     if (shapeInTop){
       this.gameover = true;
       this.shape.freezed = true;
+      //reset audio 
+      this.$soundtrack.pause();
+      this.$soundtrack.currentTime = 0;
     }
   }
   
@@ -298,6 +311,7 @@ class Game {
       this.reset();
     } else {
       this.started = true;
+      this.$soundtrack.play();
     }
   }
 }
