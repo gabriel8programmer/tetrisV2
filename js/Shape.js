@@ -1,7 +1,10 @@
 
-import Block from "./Block.js";
+import Block from "./block.js";
 
 class Shape {
+  //timers
+  static moveInterval = 500
+  static moveTime = 0
   constructor(x, y, w, h, type){
     this.x = x;
     this.y = y;
@@ -9,8 +12,6 @@ class Shape {
     this.h = h;
     this.type = type;
     //control variables
-    this.time = 500;
-    this.loop;
     this.rotation = 0;
     this.freezed = false;
     //shapes
@@ -40,6 +41,12 @@ class Shape {
     return shapeFirst.map(([x, y]) => {
       return new Block(x + this.x, y + this.y, this.w, this.h, this.type.src);
     });
+  }
+  
+  static decreaseMoveInterval(minInterval, step){
+    if (Shape.moveInterval - step < minInterval) return
+    Shape.moveInterval -= step
+    console.log(Shape.moveInterval)
   }
   
   get position(){
@@ -109,7 +116,7 @@ class Shape {
     //test if there was a collision with other shape
     const collided = this.checkCollideWithOtherShape(shape);
     //back the shape
-    this.y = y;
+    this.y = y
     this.shape = this.$shape();
     //return collided value (true, false)
     return collided;

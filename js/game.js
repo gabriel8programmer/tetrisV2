@@ -1,7 +1,7 @@
 
-import Shape from "./Shape.js";
-import Block from "./Block.js";
-import Text from "./TextObj.js";
+import Shape from "./shape.js";
+import Block from "./block.js";
+import Text from "./text.js";
 
 class Game {
   constructor(game){
@@ -15,9 +15,7 @@ class Game {
     this.bs = 20; //block size
     this.width = this.cols * this.bs + (this.panelCols * this.bs);
     this.height = this.rows * this.bs;
-    this.initialFrame = 400;
-    this.frames = this.initialFrame;
-    this.frameLimit = 100;
+    this.fps = 0
     this.loop;
     this.started = false;
     this.gameover = false;
@@ -218,7 +216,7 @@ class Game {
       this.moveRestBlocksForDown();
       //update score and velocity and play sound
       this.updateScore(100 * this.blocks.length/(this.cols-2));
-      this.updateVelocity(10);
+      Shape.decreaseMoveInterval(100, 10);
       this.$audioPoint.play();
     }
   }
@@ -238,16 +236,6 @@ class Game {
     this.score += inc;
   }
   
-  updateVelocity(inc){
-    this.frames-=inc;
-    if (this.frames <= this.frameLimit) {
-      this.frames = this.frameLimit;
-    }
-    //update game loop
-    clearInterval(this.loop);
-    this.loop = setInterval(this.update.bind(this), this.frames);
-  }
-  
   freezeShape(){
     if (this.shape.freezed){
       this.checkThereWasCombination();
@@ -257,14 +245,20 @@ class Game {
       this.checkGameOver();
       //define score and frames
       this.updateScore(10);
-      this.updateVelocity(1);
+      Shape.decreaseMoveInterval(100, 2);
     }
   }
   
   updateShape(){
     this.shape.freezed = !this.down;
+    
+    //add timer in the movement
+    if (this.fps - Shape.moveTime >= Shape.moveInterval){
+      this.shape.moveDown();
+      Shape.moveTime = this.fps
+    }
+    
     this.freezeShape();
-    this.shape.moveDown();
   }
   
   update(){
@@ -273,14 +267,27 @@ class Game {
     this.updateShape();
   }
   
+  //all events here
+  events(){
+    
+  }
+  
   start(){
     //define first shape
     this.defineRandomShapeType();
     this.defineNewShape(this.shapeTypeSorted);
     this.defineNextShape();
-    //render and update game
-    setInterval(this.render.bind(this), 1000/60);
-    this.loop = setInterval(this.update.bind(this), this.frames);
+    //run the game
+    this.run()
+  }
+  
+  run(fps){
+    this.fps = fps
+    this.render()
+    this.update()
+    this.events()
+    //game loop
+    this.loop = requestAnimationFrame(this.run.bind(this))
   }
   
   reset(){
