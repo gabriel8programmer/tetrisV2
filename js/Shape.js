@@ -3,6 +3,7 @@ import Block from "./block.js";
 
 class Shape {
   //timers
+  static initialInterval = 500
   static moveInterval = 500
   static moveTime = 0
   constructor(x, y, w, h, type){

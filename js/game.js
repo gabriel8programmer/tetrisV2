@@ -16,7 +16,7 @@ class Game {
     this.width = this.cols * this.bs + (this.panelCols * this.bs);
     this.height = this.rows * this.bs;
     this.fps = 0
-    this.loop;
+    this.loop = null;
     this.started = false;
     this.gameover = false;
     this.score = 0;
@@ -33,22 +33,22 @@ class Game {
       {name: "z", src: "./img/block08.png"},
     ];
     this.shapeSortedIndex = 0;
-    this.shapeTypeSorted;
-    this.shape;
-    this.nextShape;
+    this.shapeTypeSorted = null;
+    this.shape = null;
+    this.nextShape = null;
     
     //initialize canvas
     this.game.width = this.width;
     this.game.height = this.height;
-    //get audios and config
-    this.$audioPoint = document.querySelector("#audio-point");
-    this.$audioPoint.volume = 0.5;
-    this.$soundtrack = document.querySelector("#audio-soundtrack");
-    this.$soundtrack.volume = 0.5;
-    //event the sound
-    this.$soundtrack.addEventListener("ended", ()=> {
-      this.$soundtrack.play();
-    });
+  }
+  
+  $Audio(audioId, ended=false){
+    const $audio = document.querySelector(audioId);
+    $audio.volume = 0.5;
+    if (ended){
+      $audio.addEventListener("ended", $audio.play)
+    }
+    $audio.play()
   }
   
   defineRandomShapeType(){
@@ -217,7 +217,7 @@ class Game {
       //update score and velocity and play sound
       this.updateScore(100 * this.blocks.length/(this.cols-2));
       Shape.decreaseMoveInterval(100, 10);
-      this.$audioPoint.play();
+      this.$Audio("#audio-point")
     }
   }
   
@@ -267,11 +267,6 @@ class Game {
     this.updateShape();
   }
   
-  //all events here
-  events(){
-    
-  }
-  
   start(){
     //define first shape
     this.defineRandomShapeType();
@@ -285,7 +280,6 @@ class Game {
     this.fps = fps
     this.render()
     this.update()
-    this.events()
     //game loop
     this.loop = requestAnimationFrame(this.run.bind(this))
   }
@@ -297,9 +291,8 @@ class Game {
     this.started = false;
     this.gameover = false;
     this.score = 0;
-    this.frames = this.initialFrame;
-    //clear gameloop
-    clearInterval(this.loop);
+    //reset move interval
+    Shape.moveInterval = Shape.initialInterval
     //play again
     this.start();
   }
@@ -318,7 +311,7 @@ class Game {
       this.reset();
     } else {
       this.started = true;
-      this.$soundtrack.play();
+      this.$Audio("#audio-soundtrack", true)
     }
   }
 }
