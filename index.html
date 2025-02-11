@@ -1,41 +1,64 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tetris</title>
-  <!--google fonts-->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <!--fontawesome-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!--css and javascript-->
-  <link rel="stylesheet" href="./css/styles.css">
-  <script src="./js/index.js" type="module" defer></script>
-</head>
-<body>
-  <h1>Tetris</h1>
-  <canvas id="game"></canvas>
-  <div id="controls" class="container-controls">
-    <button class="btn" id="left" data-key="ArrowLeft">
-      <i class="fa-solid fa-caret-left"></i>
-    </button>
-    <button class="btn" id="rotate" data-key="rotate">
-      <i class="fa-solid fa-rotate-right"></i>
-    </button>
-    <button class="btn" id="right" data-key="ArrowRight">
-      <i class="fa-solid fa-caret-right"></i>
-    </button>
-    <button class="btn" id="down" data-key="ArrowDown">
-      <i class="fa-solid fa-caret-down"></i>
-    </button>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tetris</title>
+    <!--google fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <!--fontawesome-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!--css and javascript-->
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <h1>Tetris</h1>
+    <canvas id="game"></canvas>
+    <div id="controls" class="container-controls">
+      <button class="btn" id="left" data-key="ArrowLeft">
+        <i class="fa-solid fa-caret-left"></i>
+      </button>
+      <button class="btn" id="rotate" data-key="rotate">
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+      <button class="btn" id="right" data-key="ArrowRight">
+        <i class="fa-solid fa-caret-right"></i>
+      </button>
+      <button class="btn" id="down" data-key="ArrowDown">
+        <i class="fa-solid fa-caret-down"></i>
+      </button>
+    </div>
 
-  <!--audios-->
-  <audio id="audio-soundtrack" src="./audios/soundtrack.wav" controls></audio>
-  <audio id="audio-point" src="./audios/coin.wav" controls></audio>
+    <!-- images -->
+    <div class="images">
+      <img src="./img/block00.png" alt="bloco preto" id="block00" />
+      <img src="./img/block01.png" alt="bloco cinza" id="block01" />
+      <img src="./img/block02.png" alt="bloco vermelho" id="block02" />
+      <img src="./img/block03.png" alt="bloco verde" id="block03" />
+      <img src="./img/block04.png" alt="bloco azul" id="block04" />
+      <img src="./img/block05.png" alt="bloco amarelo" id="block05" />
+      <img src="./img/block06.png" alt="bloco rosa" id="block06" />
+      <img src="./img/block07.png" alt="bloco ciano" id="block07" />
+      <img src="./img/block08.png" alt="bloco laranja" id="block08" />
+    </div>
 
-</body>
+    <!--audios-->
+    <audio id="audio-soundtrack" src="./audios/soundtrack.wav" controls></audio>
+    <audio id="audio-point" src="./audios/coin.wav" controls></audio>
+
+    <!-- script -->
+    <script src="./js/index.js" type="module" defer></script>
+  </body>
 </html>

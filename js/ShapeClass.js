@@ -1,8 +1,8 @@
 
-import Block from "./Block.js";
+import Block from "./BlockClass.js";
 
 class Shape {
-  constructor(x, y, w, h, type){
+  constructor(x, y, w, h, type) {
     this.x = x;
     this.y = y;
     this.w = w;
@@ -14,14 +14,14 @@ class Shape {
     this.rotation = 0;
     this.freezed = false;
     //shapes
-    this.coords={};
-    this.iCoords = [[[0,0], [0,1], [0,2], [0,3]], [[0,0], [1,0], [2,0], [3,0]]];
-    this.jCoords = [[[1,0], [1,1], [1,2], [0,2]], [[0,0], [0,1], [1,1], [2,1]], [[0,0], [1,0], [0,1], [0,2]], [[0,0], [1,0], [2,0], [2,1]]];
-    this.lCoords = [[[0,0], [0,1], [0,2], [1,2]], [[0,0], [1,0], [2,0], [0,1]], [[0,0], [1,0], [1,1], [1,2]], [[0,1], [1,1], [2,1], [2,0]]];
-    this.oCoords = [[[0,0], [1,0], [0,1], [1,1]]];
-    this.sCoords = [[[2,0], [1,0], [1,1], [0,1]], [[0,0], [0,1], [1,1], [1,2]]];
-    this.tCoords = [[[0,0], [1,0], [2,0], [1,1]], [[1,0], [0,1], [1,1], [1,2]], [[1,0], [0,1], [1,1], [2,1]], [[0,0], [0,1], [1,1], [0,2]]];
-    this.zCoords = [[[0,0], [1,0], [1,1], [2,1]], [[1,0], [0,1], [1,1], [0,2]]];
+    this.coords = {};
+    this.iCoords = [[[0, 0], [0, 1], [0, 2], [0, 3]], [[0, 0], [1, 0], [2, 0], [3, 0]]];
+    this.jCoords = [[[1, 0], [1, 1], [1, 2], [0, 2]], [[0, 0], [0, 1], [1, 1], [2, 1]], [[0, 0], [1, 0], [0, 1], [0, 2]], [[0, 0], [1, 0], [2, 0], [2, 1]]];
+    this.lCoords = [[[0, 0], [0, 1], [0, 2], [1, 2]], [[0, 0], [1, 0], [2, 0], [0, 1]], [[0, 0], [1, 0], [1, 1], [1, 2]], [[0, 1], [1, 1], [2, 1], [2, 0]]];
+    this.oCoords = [[[0, 0], [1, 0], [0, 1], [1, 1]]];
+    this.sCoords = [[[2, 0], [1, 0], [1, 1], [0, 1]], [[0, 0], [0, 1], [1, 1], [1, 2]]];
+    this.tCoords = [[[0, 0], [1, 0], [2, 0], [1, 1]], [[1, 0], [0, 1], [1, 1], [1, 2]], [[1, 0], [0, 1], [1, 1], [2, 1]], [[0, 0], [0, 1], [1, 1], [0, 2]]];
+    this.zCoords = [[[0, 0], [1, 0], [1, 1], [2, 1]], [[1, 0], [0, 1], [1, 1], [0, 2]]];
     //define coords
     this.coords.i = this.iCoords;
     this.coords.j = this.jCoords;
@@ -34,15 +34,15 @@ class Shape {
     this.shapes = this.coords[this.type.name];
     this.shape = this.$shape();
   }
-  
-  $shape(){
+
+  $shape() {
     const shapeFirst = this.shapes[this.rotation];
     return shapeFirst.map(([x, y]) => {
-      return new Block(x + this.x, y + this.y, this.w, this.h, this.type.src);
+      return new Block(x + this.x, y + this.y, this.w, this.h, this.type.img);
     });
   }
-  
-  get position(){
+
+  get position() {
     const x = {
       max: Math.max(...this.shape.map(block => block.x)),
       min: Math.min(...this.shape.map(block => block.x))
@@ -51,29 +51,29 @@ class Shape {
       max: Math.max(...this.shape.map(block => block.y)),
       min: Math.min(...this.shape.map(block => block.y)),
     }
-    return {x, y};
+    return { x, y };
   }
-  
-  get rotatePosition(){
+
+  get rotatePosition() {
     const rotation = this.rotation;
     //rotate for to test positions
     this.rotate();
-    const {x, y} = this.position;
+    const { x, y } = this.position;
     //back the shape
     this.rotation = rotation;
     this.shape = this.$shape();
-    return {x, y};
+    return { x, y };
   }
-  
-  checkCollideWithOtherShape({shape}){
+
+  checkCollideWithOtherShape({ shape }) {
     return this.shape.some(shapeBlock => {
       return shape.some(block => {
         return shapeBlock.collided(block);
       });
     })
   }
-  
-  checkCollideRight(shape){
+
+  checkCollideRight(shape) {
     //save current x
     const x = this.x;
     //move for right
@@ -86,8 +86,8 @@ class Shape {
     //return collided value (true, false)
     return collided;
   }
-  
-  checkCollideLeft(shape){
+
+  checkCollideLeft(shape) {
     //save current x
     const x = this.x;
     //move for left
@@ -100,8 +100,8 @@ class Shape {
     //return collided value (true, false)
     return collided;
   }
-  
-  checkCollideDown(shape){
+
+  checkCollideDown(shape) {
     //save current y
     const y = this.y;
     //move for down
@@ -114,8 +114,8 @@ class Shape {
     //return collided value (true, false)
     return collided;
   }
-  
-  checkCollideRotate(shape){
+
+  checkCollideRotate(shape) {
     //save current rotation
     const rot = this.rotation;
     //rotate
@@ -128,36 +128,36 @@ class Shape {
     //return collided value (true, false)
     return collided;
   }
-  
-  render(ctx){
+
+  render(ctx) {
     this.shape.forEach(block => {
       block.render(ctx);
     });
   }
-  
-  moveRight(){
+
+  moveRight() {
     if (this.freezed) return
     this.x++;
     this.shape = this.$shape();
   }
-  
-  moveLeft(){
+
+  moveLeft() {
     if (this.freezed) return
     this.x--;
     this.shape = this.$shape();
   }
-  
-  moveDown(){
+
+  moveDown() {
     if (this.freezed) return
     this.y++;
     this.shape = this.$shape();
   }
-  
-  rotate(){
+
+  rotate() {
     if (this.freezed) return
     this.rotation++;
-    if (this.rotation >= this.shapes.length){
-      this.rotation=0;
+    if (this.rotation >= this.shapes.length) {
+      this.rotation = 0;
     }
     this.shape = this.$shape();
   }
