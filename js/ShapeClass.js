@@ -2,10 +2,6 @@
 import Block from "./BlockClass.js";
 
 class Shape {
-  //timers
-  static initialInterval = 500
-  static moveInterval = 500
-  static moveTime = 0
   constructor(x, y, w, h, type) {
     this.x = x;
     this.y = y;
@@ -42,11 +38,6 @@ class Shape {
     return shapeFirst.map(([x, y]) => {
       return new Block(x + this.x, y + this.y, this.w, this.h, this.type.img);
     });
-  }
-
-  static decreaseMoveInterval(minInterval, step) {
-    if (Shape.moveInterval - step < minInterval) return
-    Shape.moveInterval -= step
   }
 
   get position() {

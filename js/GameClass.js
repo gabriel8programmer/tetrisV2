@@ -15,10 +15,18 @@ class Game {
     this.bs = 20; //block size
     this.width = this.cols * this.bs + (this.panelCols * this.bs);
     this.height = this.rows * this.bs;
+
+    //timers
+    this.initialInterval = 400
+    this.moveInterval = this.initialInterval
+    this.moveTime = 0
+    this.minInterval = 100
+
     this.fps = 0
     this.loop = null;
     this.started = false;
     this.gameover = false;
+
     this.score = 0;
     //shape variables
     this.shapes = [];
@@ -66,8 +74,14 @@ class Game {
   }
 
   createNewShape() {
-    const type = this.getRandomShapeType();
-    this.shape = new Shape(this.cols / 2 - 1, 0, this.bs, this.bs, type);
+    if (this.nextShape !== null) {
+      const { type } = this.nextShape;
+      this.shape = new Shape(this.cols / 2 - 1, 0, this.bs, this.bs, type);
+    } else {
+      const type = this.getRandomShapeType();
+      this.shape = new Shape(this.cols / 2 - 1, 0, this.bs, this.bs, type);
+    }
+
     //update shapes
     this.shapes.push(this.shape);
 
@@ -199,6 +213,16 @@ class Game {
     });
   }
 
+  decreaseMoveInterval(step) {
+    if (this.moveInterval <= this.initialInterval) {
+      this.moveInterval = this.initialInterval;
+      return;
+    }
+    this.moveInterval -= step;
+
+    console.log(this.moveInterval);
+  }
+
   checkThereWasCombination() {
     //get all blocks in the board game
     const blockShapes = this.shapes.reduce((blocks, { shape }) => {
@@ -223,8 +247,8 @@ class Game {
       this.moveRestBlocksForDown();
       //update score and velocity and play sound
       this.updateScore(100 * this.blocks.length / (this.cols - 2));
-      Shape.decreaseMoveInterval(100, 10);
-      this.$Audio("#audio-point")
+      this.decreaseMoveInterval(10);
+      this.$Audio("#audio-point");
     }
   }
 
@@ -232,10 +256,8 @@ class Game {
     const shapeInTop = this.shapes.some(shape => shape.position.y.min <= 1 && shape.freezed);
     if (shapeInTop) {
       this.gameover = true;
+      this.started = false;
       this.shape.freezed = true;
-      //reset audio 
-      this.$soundtrack.pause();
-      this.$soundtrack.currentTime = 0;
     }
   }
 
@@ -243,37 +265,36 @@ class Game {
     this.score += inc;
   }
 
-  freezeShape() {
+  checkIfShapeIsFreezed() {
     if (this.shape.freezed) {
       this.checkThereWasCombination();
       //new shape and next shape
-      this.createNewShape();
       this.checkGameOver();
+      this.createNewShape();
       //define score and frames
       this.updateScore(10);
-      Shape.decreaseMoveInterval(100, 2);
+      this.decreaseMoveInterval(2);
     }
   }
 
   updateShape() {
     this.shape.freezed = !this.down;
 
-    //add timer in the movement
-    if (this.fps - Shape.moveTime >= Shape.moveInterval) {
+    //add timer in the shape movement
+    if (this.fps - this.moveTime >= this.moveInterval) {
       this.shape.moveDown();
-      Shape.moveTime = this.fps
+      this.moveTime = this.fps
     }
-
-    this.freezeShape();
   }
 
   update() {
-    if (this.gameover || !this.started) return;
-    //update
+    if (this.gameover) return;
+    this.checkIfShapeIsFreezed();
     this.updateShape();
   }
 
   start() {
+    this.started = true;
     //define first shape
     this.createNewShape();
     //render game
@@ -281,10 +302,13 @@ class Game {
   }
 
   run(fps) {
+    if (this.loop) {
+      cancelAnimationFrame(this.loop)
+    }
     this.fps = fps
     this.render()
     this.update()
-    //game loop
+    // game loop
     this.loop = requestAnimationFrame(this.run.bind(this))
   }
 
@@ -292,30 +316,36 @@ class Game {
     this.shapes = [];
     this.shape = null;
     this.nextShape = null;
-    this.started = false;
+    this.started = true;
     this.gameover = false;
     this.score = 0;
-    //reset move interval
-    Shape.moveInterval = Shape.initialInterval
+    //reset timers
+    this.moveInterval = this.initialInterval;
+    this.moveTime = 0;
     //play again
     this.start();
   }
 
   control(key) {
-    if (!key) return;
-    if (key === "ArrowRight" && this.right && this.started) {
-      this.shape.moveRight();
-    } else if (key === "ArrowLeft" && this.left && this.started) {
-      this.shape.moveLeft();
-    } else if (key === "ArrowDown" && this.down && this.started) {
-      this.shape.moveDown();
-    } else if ((key === "rotate" || key === "ArrowUp" || key === " ") && this.rotate && this.started) {
-      this.shape.rotate();
-    } else if (this.gameover) {
+
+    //define start game
+    if (this.gameover) {
       this.reset();
-    } else {
-      this.started = true;
-      this.$Audio("#audio-soundtrack", true)
+      return;
+    }
+
+    //run the game
+    if (this.started) this.run();
+
+    //capture keys of HTMLButtons
+    if (key === "ArrowRight" && this.right) {
+      this.shape.moveRight();
+    } else if (key === "ArrowLeft" && this.left) {
+      this.shape.moveLeft();
+    } else if (key === "ArrowDown" && this.down) {
+      this.shape.moveDown();
+    } else if ((key === "rotate" || key === "ArrowUp" || key === " ") && this.rotate) {
+      this.shape.rotate();
     }
   }
 }
