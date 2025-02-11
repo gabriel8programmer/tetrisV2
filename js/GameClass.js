@@ -23,17 +23,20 @@ class Game {
     //shape variables
     this.shapes = [];
     this.blocks = [];
-    this.shapeTypes = [
-      { name: "i", src: "./img/block02.png" },
-      { name: "j", src: "./img/block03.png" },
-      { name: "l", src: "./img/block04.png" },
-      { name: "o", src: "./img/block05.png" },
-      { name: "s", src: "./img/block06.png" },
-      { name: "t", src: "./img/block07.png" },
-      { name: "z", src: "./img/block08.png" },
-    ];
-    this.shapeSortedIndex = 0;
-    this.shapeTypeSorted = null;
+
+    this.blockTypes = [
+      document.querySelector("#block00"),
+      document.querySelector("#block01"),
+      { name: "i", img: document.querySelector("#block02") },
+      { name: "j", img: document.querySelector("#block03") },
+      { name: "l", img: document.querySelector("#block04") },
+      { name: "o", img: document.querySelector("#block05") },
+      { name: "s", img: document.querySelector("#block06") },
+      { name: "t", img: document.querySelector("#block07") },
+      { name: "z", img: document.querySelector("#block08") },
+    ]
+
+    this.shapeTypes = this.blockTypes.slice(2);
     this.shape = null;
     this.nextShape = null;
 
@@ -51,21 +54,25 @@ class Game {
     $audio.play()
   }
 
-  defineRandomShapeType() {
-    this.shapeSortedIndex = Math.floor(Math.random() * this.shapeTypes.length);
-    this.shapeTypeSorted = this.shapeTypes[this.shapeSortedIndex];
+  getRandomShapeType() {
+    const shapeSortedIndex = Math.floor(Math.random() * this.shapeTypes.length);
+    return this.shapeTypes[shapeSortedIndex];
   }
 
-  defineNextShape() {
+  createNextShape() {
     //define new shape type and update next shape
-    this.defineRandomShapeType();
-    this.nextShape = new Shape(this.cols + (this.panelCols / 2 - 1), this.rows / 2 - 3, this.bs, this.bs, this.shapeTypeSorted);
+    const type = this.getRandomShapeType();
+    this.nextShape = new Shape(this.cols + (this.panelCols / 2 - 1), this.rows / 2 - 3, this.bs, this.bs, type);
   }
 
-  defineNewShape(type) {
+  createNewShape() {
+    const type = this.getRandomShapeType();
     this.shape = new Shape(this.cols / 2 - 1, 0, this.bs, this.bs, type);
     //update shapes
     this.shapes.push(this.shape);
+
+    //create next shape
+    this.createNextShape();
   }
 
   renderScreen() {
@@ -76,10 +83,10 @@ class Game {
   renderBoard() {
     for (let c = 0; c < this.cols; c++) {
       for (let r = 0; r < this.rows; r++) {
-        const block = new Block(c, r, this.bs, this.bs, "./img/block00.png");
+        const block = new Block(c, r, this.bs, this.bs, this.blockTypes[0]);
         if (c === 0 || c === this.cols - 1 || r === this.rows - 1) {
           //render walls
-          block.src = "./img/block01.png";
+          block.img = this.blockTypes[1];
           block.render(this.ctx);
         } else {
           //render background
@@ -240,8 +247,7 @@ class Game {
     if (this.shape.freezed) {
       this.checkThereWasCombination();
       //new shape and next shape
-      this.defineNewShape(this.nextShape.type);
-      this.defineNextShape();
+      this.createNewShape();
       this.checkGameOver();
       //define score and frames
       this.updateScore(10);
@@ -269,11 +275,9 @@ class Game {
 
   start() {
     //define first shape
-    this.defineRandomShapeType();
-    this.defineNewShape(this.shapeTypeSorted);
-    this.defineNextShape();
-    //run the game
-    this.run()
+    this.createNewShape();
+    //render game
+    this.render();
   }
 
   run(fps) {

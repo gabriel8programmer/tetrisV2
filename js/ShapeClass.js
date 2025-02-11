@@ -40,14 +40,13 @@ class Shape {
   $shape() {
     const shapeFirst = this.shapes[this.rotation];
     return shapeFirst.map(([x, y]) => {
-      return new Block(x + this.x, y + this.y, this.w, this.h, this.type.src);
+      return new Block(x + this.x, y + this.y, this.w, this.h, this.type.img);
     });
   }
 
   static decreaseMoveInterval(minInterval, step) {
     if (Shape.moveInterval - step < minInterval) return
     Shape.moveInterval -= step
-    console.log(Shape.moveInterval)
   }
 
   get position() {
